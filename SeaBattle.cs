@@ -43,7 +43,7 @@ int [,] CloneArray (int[,] battleFeild)
     return newArray;
 }
 
-int [] CountShips (int[,] battleField)
+int [] CountShipsByType (int[,] battleField)
 {
     int[,] battleFieldCopy = CloneArray(battleField);
 
@@ -108,24 +108,42 @@ int [] CountShips (int[,] battleField)
     {oneDeckShipsCount, twoDeckShipsCount, threeDeckShipsCount, fourDeckShipsCount};
 }
 
+int CountShipsTotal (int[,] battleField) 
+// считаем правые нижние концы всех кораблей
+{
+    int summ = 0;
+    int[,] battleFieldCopy = CloneArray(battleField);
+
+    for (int i = 0; i < battleFieldCopy.GetLength(0); i++)
+    {
+        for (int j = 0; j < battleFieldCopy.GetLength(1); j++)
+        {
+            if (battleFieldCopy[i, j] == 1 && 
+                battleFieldCopy[i + 1, j] == 0 && 
+                battleFieldCopy[i, j + 1] == 0) summ++;
+        }
+    }
+    return summ;
+}
+
 //======================================================
 
 int[,] battleField = new int[,]
 {
-    {0, 1, 0, 0, 0, 0, 1, 1, 0, 0},
+    {0, 1, 0, 0, 0, 0, 1, 1, 0, 1},
     {0, 1, 0, 1, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
     {1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
-    {1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
+    {0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
     {0, 1, 1, 1, 0, 1, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-    {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 1, 1, 0, 0, 1}
+    {1, 1, 0, 1, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 0, 1, 1, 1, 0, 1}
 };
 
 PrintBattleField(battleField);
 
-int[] ShipsCount = CountShips(battleField);
-System.Console.WriteLine($"На данном поле {ShipsCount[3]+ShipsCount[2]+ShipsCount[1]+ShipsCount[0]} кораблей:");
+int[] ShipsCount = CountShipsByType(battleField);
+System.Console.WriteLine($"На данном поле {CountShipsTotal(battleField)} кораблей:");
 System.Console.WriteLine($"4-палубных - {ShipsCount[3]}, 3-палубных - {ShipsCount[2]}, 2-палубных - {ShipsCount[1]} и 1-палубных - {ShipsCount[0]}.");
