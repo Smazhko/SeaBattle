@@ -29,21 +29,18 @@
     System.Console.WriteLine("   └───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘\n");        
 }
 
-int [,] CloneArray (int[,] battleFeild)
+int [,] EnlargeArray (int[,] battleFeild)
 {
-    int rows = battleFeild.GetLength(0);
-    int columns = battleFeild.GetLength(1);
+    int [,] newArray = new int[battleFeild.GetLength(0) + 2, battleFeild.GetLength(1) + 2];
 
-    int [,] newArray = new int[rows + 1, columns + 1];
-
-    for (int i = 0; i < rows; i++)
-        for (int j = 0; j < columns; j++)
-            newArray[i, j] = battleFeild[i, j];
+    for (int i = 0; i < battleFeild.GetLength(0); i++)
+        for (int j = 0; j < battleFeild.GetLength(1); j++)
+            newArray[i + 1, j + 1] = battleFeild[i, j];
     
     return newArray;
 }
 
-int [] CountShipsByType (int[,] battleField)
+/*int [] CountShipsByTypeOLD (int[,] battleField)
 {
     int[,] battleFieldCopy = CloneArray(battleField);
 
@@ -107,23 +104,78 @@ int [] CountShipsByType (int[,] battleField)
     return new int[]
     {oneDeckShipsCount, twoDeckShipsCount, threeDeckShipsCount, fourDeckShipsCount};
 }
+*/
+
+int [] CountShipsByType (int[,] battleField)
+{
+    int[,] newField = EnlargeArray(battleField);
+    int [] results = new int [Math.Max(battleField.GetLength(0), battleField.GetLength(1)) + 1];
+    
+    for (int i = 1; i < newField.GetLength(0); i++)
+    {
+        for (int j = 1; j < newField.GetLength(1); j++)
+        {
+            int shipLength = 1;
+            
+            if (newField[i, j] == 1 && 
+                newField[i - 1, j] == 0 && 
+                newField[i, j - 1] == 0)
+            {
+                if (newField[i, j + 1] == 0) // если ДА, то считаем длину ВЕРТИКАЛЬНО
+                {
+                    while (true)
+                    {
+                        if (newField[i + shipLength, j] == 0)
+                        {
+                            results[shipLength] ++; 
+                            break;
+                        }
+                        else
+                            shipLength++;
+                    }
+                }
+                else   // ИНАЧЕ считаем ГОРИЗОНТАЛЬНО
+                {
+                    while (true)
+                    {
+                        if (newField[i, j + shipLength] == 0)
+                        {
+                            results[shipLength] ++; 
+                            break;
+                        }
+                        else
+                            shipLength++;
+                    }
+                }
+            }
+
+        }
+    }
+    return results;
+}
 
 int CountShipsTotal (int[,] battleField) 
 // считаем правые нижние концы всех кораблей
 {
     int summ = 0;
-    int[,] battleFieldCopy = CloneArray(battleField);
 
-    for (int i = 0; i < battleFieldCopy.GetLength(0); i++)
+    for (int i = 0; i < battleField.GetLength(0); i++)
     {
-        for (int j = 0; j < battleFieldCopy.GetLength(1); j++)
+        for (int j = 0; j < battleField.GetLength(1); j++)
         {
-            if (battleFieldCopy[i, j] == 1 && 
-                battleFieldCopy[i + 1, j] == 0 && 
-                battleFieldCopy[i, j + 1] == 0) summ++;
+            if (battleField[i, j] == 1 && 
+                (i == 0 || battleField[i - 1, j] == 0) && 
+                (j == 0 || battleField[i, j - 1] == 0)) summ++;
         }
     }
     return summ;
+}
+
+void PrintResult (int[] arr)
+{
+    for (int i = 1; i < arr.Length; i++)
+        if (arr[i] != 0) 
+            Console.WriteLine($"{i}-палубных: {arr[i]} шт.");
 }
 
 //======================================================
@@ -131,19 +183,23 @@ int CountShipsTotal (int[,] battleField)
 int[,] battleField = new int[,]
 {
     {0, 1, 0, 0, 0, 0, 1, 1, 0, 1},
-    {0, 1, 0, 1, 0, 0, 0, 0, 0, 0},
+    {0, 1, 0, 1, 0, 0, 0, 0, 0, 1},
     {0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
     {1, 0, 1, 0, 0, 0, 0, 1, 0, 1},
     {1, 0, 1, 0, 1, 1, 0, 1, 0, 1},
     {0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-    {0, 1, 1, 1, 0, 1, 0, 0, 0, 0},
+    {1, 1, 1, 1, 0, 1, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-    {1, 1, 0, 1, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 1, 0, 1, 1, 1, 0, 1}
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
 
 PrintBattleField(battleField);
 
-int[] ShipsCount = CountShipsByType(battleField);
+//int[] ShipsCount = CountShipsByTypeOLD(battleField);
+//System.Console.WriteLine($"На данном поле {CountShipsTotal(battleField)} кораблей:");
+//System.Console.WriteLine($"4-палубных - {ShipsCount[3]}, 3-палубных - {ShipsCount[2]}, 2-палубных - {ShipsCount[1]} и 1-палубных - {ShipsCount[0]}.");
+
 System.Console.WriteLine($"На данном поле {CountShipsTotal(battleField)} кораблей:");
-System.Console.WriteLine($"4-палубных - {ShipsCount[3]}, 3-палубных - {ShipsCount[2]}, 2-палубных - {ShipsCount[1]} и 1-палубных - {ShipsCount[0]}.");
+PrintResult(CountShipsByType(battleField));
+
