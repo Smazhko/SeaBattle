@@ -1,7 +1,7 @@
 ﻿void PrintBattleField (int[,] battleFeild)
 {
-    int rows = 10; //battleFeild.GetLength(0);
-    int cols = 10; //battleFeild.GetLength(1);
+    int rows = battleFeild.GetLength(0);
+    int cols = battleFeild.GetLength(1);
 
 
     System.Console.WriteLine("     А   B   C   D   E   F   G   H   K   L");
@@ -193,6 +193,11 @@ int[,] battleField = new int[,]
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
+
+// int[,] battleField = new int[,]
+// {
+//     {1}
+// };
 
 PrintBattleField(battleField);
 
